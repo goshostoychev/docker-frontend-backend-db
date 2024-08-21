@@ -1,0 +1,25 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kompose.cmd: C:\Users\Admin\AppData\Local\Microsoft\WinGet\Packages\Kubernetes.kompose_Microsoft.Winget.Source_8wekyb3d8bbwe\kompose.exe convert
+    kompose.service.expose: app-dns.local
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: app-front
+  name: app-front
+spec:
+  rules:
+    - host: app-dns.local
+      http:
+        paths:
+          - backend:
+              service:
+                name: app-front
+                port:
+                  number: 3000
+            path: /
+            pathType: Prefix
+status:
+  loadBalancer: {}

@@ -1,37 +1,42 @@
 services:
-  web:
-    build: ./frontend
-    depends_on:
-      - api
+  app-db:
+    image: "mongo:latest"
     ports:
-      - "3000:3000"
-    networks:
-      - network-backend
-  api:
-    build: ./backend
-    depends_on:
-      - mongo
+      - 27017:27017
+    environment:
+      POSTGRES_USER: username
+      POSTGRES_PASSWORD: password
+
+  app-back:
+    image: "g0sh3x/devops-demos:backend-image-v1"
+    build:
+      context: back/target
+      dockerfile: ./backend/Dockerfile # relative to context
     ports:
-      - "3001:3001"
-    networks: 
-     - network-backend
-  
-  mongo:
-    image: mongo
-    restart: always
-    volumes: 
-      - mongodb_data:/data/db
-    environment: 
-      MONGODB_INITDB_ROOT_USERNAME: username
-      MONGODB_INITDB_ROOT_PASSWORD: password
-    # uncomment following lines to access db locally
-    # ports:
-    #   - 27017:27017
-    networks: 
-     - network-backend
+      - ${INGRESS_PORT:-3001}:3001
+    depends_on:
+      - app-db
+    labels:
+      kompose.service.expose: "app-${NAMESPACE:-dns}.${ROOT_DNS:-local}/api"
+    deploy:
+      resources:
+        reservations:
+          cpus: "0.01"
+          memory: 512M
 
-networks:
-  network-backend:
-
-volumes: 
-  mongodb_data:
+  app-front:
+    image: "g0sh3x/devops-demos:frontend-image-v1"
+    build:
+      context: front/
+      dockerfile: ./fontend/Dockerfile # relative to context
+    depends_on:
+      - app-back
+    ports:
+      - ${INGRESS_PORT:-3000}:3000
+    labels:
+      kompose.service.expose: "app-${NAMESPACE:-dns}.${ROOT_DNS:-local}"
+    deploy:
+      resources:
+        reservations:
+          cpus: "0.01"
+          memory: 64M

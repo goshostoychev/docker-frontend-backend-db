@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: C:\Users\Admin\AppData\Local\Microsoft\WinGet\Packages\Kubernetes.kompose_Microsoft.Winget.Source_8wekyb3d8bbwe\kompose.exe convert
+    kompose.service.expose: app-dns.local/api
+    kompose.version: 1.31.2 (a92241f79)
+  creationTimestamp: null
+  labels:
+    io.kompose.service: app-back
+  name: app-back
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: app-back
+  strategy: {}
+  template:
+    metadata:
+      annotations:
+        kompose.cmd: C:\Users\Admin\AppData\Local\Microsoft\WinGet\Packages\Kubernetes.kompose_Microsoft.Winget.Source_8wekyb3d8bbwe\kompose.exe convert
+        kompose.service.expose: app-dns.local/api
+        kompose.version: 1.31.2 (a92241f79)
+      creationTimestamp: null
+      labels:
+        io.kompose.network/tmp-default: "true"
+        io.kompose.service: app-back
+    spec:
+      containers:
+        - image: g0sh3x/devops-demos:backend-image-v1
+          name: app-back
+          ports:
+            - containerPort: 3001
+              hostPort: 3001
+              protocol: TCP
+          resources:
+            requests:
+              cpu: 10m
+              memory: "536870912"
+      restartPolicy: Always
+status: {}
